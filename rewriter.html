@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Rewriter — Free Online Tool</title>
+  <meta name="description" content="Rewrite any text in your chosen tone — casual, formal, creative, or simple. Free AI-powered rewriter." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f5f7fa; color: #1f2937; line-height: 1.6; min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+    .container { max-width: 780px; margin: 0 auto; padding: 0 20px; width: 100%; flex: 1; }
+    header { text-align: center; padding: 40px 0 8px; }
+    header a { color: #2563eb; text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+    header a:hover { text-decoration: underline; }
+    header h1 { font-size: 2rem; color: #2563eb; font-weight: 800; letter-spacing: -0.3px; margin-top: 4px; }
+    header p { color: #6b7280; margin-top: 4px; font-size: 0.95rem; }
+    .card { background: #fff; border-radius: 16px; padding: 32px; margin: 24px 0; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+    label { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; color: #374151; }
+    textarea {
+      width: 100%; padding: 14px 16px; border: 1px solid #d1d5db; border-radius: 10px;
+      font-size: 1rem; font-family: inherit; resize: vertical; transition: border-color .2s;
+      background: #fafafa; min-height: 120px;
+    }
+    textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.15); background: #fff; }
+    select {
+      width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 10px;
+      font-size: 1rem; font-family: inherit; background: #fafafa; cursor: pointer;
+      transition: border-color .2s; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px;
+    }
+    select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.15); background: #fff; }
+    .style-options { display: flex; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+    .style-option {
+      flex: 1; min-width: 100px; padding: 10px 12px; text-align: center; border: 1.5px solid #d1d5db;
+      border-radius: 10px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all .2s;
+      background: #fafafa; color: #6b7280;
+    }
+    .style-option:hover { border-color: #93c5fd; background: #eff6ff; color: #2563eb; }
+    .style-option.active { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #2563eb; color: #fff; border: none; padding: 12px 32px;
+      border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer;
+      transition: background .2s, transform .1s; margin-top: 16px;
+    }
+    .btn:hover { background: #1d4ed8; }
+    .btn:active { transform: scale(.97); }
+    .btn:disabled { background: #93c5fd; cursor: not-allowed; transform: none; }
+    .btn-outline {
+      background: transparent; color: #2563eb; border: 1.5px solid #2563eb; padding: 8px 20px;
+      border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      transition: background .2s; margin-top: 0;
+    }
+    .btn-outline:hover { background: #eff6ff; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+    .toolbar h2 { font-size: 1.1rem; color: #1f2937; font-weight: 700; }
+    .spinner { display: none; width: 20px; height: 20px; border: 2.5px solid #bfdbfe; border-top-color: #2563eb; border-radius: 50%; animation: spin .6s linear infinite; margin: 0 auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading .spinner { display: block; }
+    .result-box {
+      padding: 16px; background: #f9fafb; border-radius: 8px; border-left: 3px solid #2563eb;
+      font-size: 0.95rem; line-height: 1.7; white-space: pre-wrap;
+    }
+    .empty-state { text-align: center; color: #9ca3af; padding: 40px 0; font-size: 0.95rem; }
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 8px; }
+    .error-msg { background: #fef2f2; color: #b91c1c; padding: 12px 16px; border-radius: 8px; margin-top: 12px; font-size: 0.9rem; display: none; }
+    .ad-placeholder { background: #e5e7eb; border-radius: 8px; padding: 20px; text-align: center; color: #9ca3af; font-size: 0.85rem; margin: 24px 0; max-width: 728px; margin-left: auto; margin-right: auto; }
+    footer { text-align: center; padding: 24px 0 40px; color: #9ca3af; font-size: 0.85rem; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #1f2937; color: #fff; padding: 10px 24px; border-radius: 8px;
+      font-size: 0.9rem; opacity: 0; transition: opacity .3s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.5rem; }
+      .card { padding: 20px; margin: 16px 0; }
+      .btn { width: 100%; justify-content: center; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .btn-outline { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="index.html">← Back to Home</a>
+      <h1>✍️ AI Rewriter</h1>
+      <p>Rewrite any text in your preferred tone. Choose a style and see the magic.</p>
+    </header>
+
+    <div class="card">
+      <label for="input-text">Enter the text you want to rewrite</label>
+      <textarea id="input-text" placeholder="Paste or type the text you'd like to rewrite..."></textarea>
+
+      <label style="margin-top: 16px;">Choose a tone</label>
+      <div class="style-options" id="style-options">
+        <div class="style-option active" data-style="casual">😊 Casual</div>
+        <div class="style-option" data-style="formal">👔 Formal</div>
+        <div class="style-option" data-style="creative">🎨 Creative</div>
+        <div class="style-option" data-style="simple">📖 Simple</div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <button class="btn" id="rewrite-btn">✨ Rewrite</button>
+        <div class="spinner" id="spinner"></div>
+      </div>
+      <div class="error-msg" id="error-msg"></div>
+    </div>
+
+    <div class="card" id="results-card" style="display:none;">
+      <div class="toolbar">
+        <h2>📋 Rewritten Text</h2>
+        <button class="btn-outline" id="copy-btn">📄 Copy All</button>
+      </div>
+      <div class="result-box" id="result-box"></div>
+    </div>
+
+    <div class="card" id="empty-card">
+      <div class="empty-state">
+        <div class="icon">✍️</div>
+        <p>Enter some text, select a tone, and click "Rewrite" to see the result.</p>
+      </div>
+    </div>
+
+    <div class="ad-placeholder">📢 AdSense Ad Unit (728×90)</div>
+  </div>
+
+  <footer>&copy; 2025 AI Tools. All rights reserved.</footer>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API_URL = "https://ai-tool-api.278750417.workers.dev/api/";
+
+    const inputEl = document.getElementById("input-text");
+    const rewriteBtn = document.getElementById("rewrite-btn");
+    const spinner = document.getElementById("spinner");
+    const resultsCard = document.getElementById("results-card");
+    const emptyCard = document.getElementById("empty-card");
+    const resultBox = document.getElementById("result-box");
+    const copyBtn = document.getElementById("copy-btn");
+    const errorMsg = document.getElementById("error-msg");
+    const styleOptions = document.getElementById("style-options");
+    const toast = document.getElementById("toast");
+    let selectedStyle = "casual";
+
+    // Style selection
+    styleOptions.querySelectorAll(".style-option").forEach(opt => {
+      opt.addEventListener("click", () => {
+        styleOptions.querySelectorAll(".style-option").forEach(o => o.classList.remove("active"));
+        opt.classList.add("active");
+        selectedStyle = opt.dataset.style;
+      });
+    });
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2000);
+    }
+
+    function setLoading(loading) {
+      rewriteBtn.disabled = loading;
+      rewriteBtn.classList.toggle("loading", loading);
+      spinner.style.display = loading ? "block" : "none";
+    }
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.style.display = "block";
+    }
+
+    function hideError() {
+      errorMsg.style.display = "none";
+    }
+
+    async function rewriteText() {
+      const text = inputEl.value.trim();
+      if (!text) {
+        showError("Please enter some text to rewrite.");
+        inputEl.focus();
+        return;
+      }
+      hideError();
+      setLoading(true);
+      resultsCard.style.display = "none";
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "rewrite", text, style: selectedStyle })
+        });
+
+        if (!res.ok) {
+          const errText = await res.text().catch(() => "");
+          throw new Error(`Server error (${res.status})${errText ? ": " + errText : ""}`);
+        }
+
+        const data = await res.json();
+        let rewritten = "";
+
+        if (typeof data === "string") {
+          rewritten = data;
+        } else if (data.result) {
+          rewritten = data.result;
+        } else if (data.text) {
+          rewritten = data.text;
+        } else if (data.rewritten) {
+          rewritten = data.rewritten;
+        } else if (data.data && typeof data.data === "string") {
+          rewritten = data.data;
+        } else if (Array.isArray(data)) {
+          rewritten = data.join("\n");
+        } else {
+          // try any string field
+          for (const key in data) {
+            if (typeof data[key] === "string" && data[key].length > 10) {
+              rewritten = data[key];
+              break;
+            }
+          }
+        }
+
+        if (!rewritten) {
+          throw new Error("No rewritten text returned. Please try again.");
+        }
+
+        renderResults(rewritten);
+      } catch (err) {
+        showError(err.message);
+        setLoading(false);
+      }
+    }
+
+    function renderResults(text) {
+      resultBox.textContent = text;
+      resultsCard.style.display = "block";
+      emptyCard.style.display = "none";
+      setLoading(false);
+    }
+
+    copyBtn.addEventListener("click", () => {
+      const text = resultBox.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("Copied to clipboard!");
+      }).catch(() => {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        showToast("Copied to clipboard!");
+      });
+    });
+
+    rewriteBtn.addEventListener("click", rewriteText);
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && e.ctrlKey) {
+        e.preventDefault();
+        rewriteText();
+      }
+    });
+  </script>
+</body>
+</html>
